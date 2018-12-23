@@ -11,19 +11,6 @@ def index(request):
     form = CatForm()
     return render(request, 'index.html', {'cats':cats, 'form':form})
 
-class Cat:
-    def __init__(self, name, breed, description, age):
-        self.name = name
-        self.breed = breed
-        self.description = description
-        self.age = age
-
-cats = [
-    Cat('Polo', 'tabby', 'foul little demon', 3),
-    Cat('Sachi', 'tortoise shell', 'diluted tortoise shell', 0),
-    Cat('Raven', 'black tripod', '3 legged cat', 4)
-]
-
 def show(request, cat_id):
     cat = Cat.objects.get(id=cat_id)
     return render(request, 'show.html', {'cat': cat})
@@ -36,25 +23,12 @@ def post_cat(request):
         cat.save()
     return HttpResponseRedirect('/')
 
-    if form.is_valid():
-        cat = Cat(
-            name=form.cleaned_data['name'],
-            breed=form.cleaned_data['breed'],
-            description=form.cleaned_data['description'],
-            age=form.cleaned_data['age']
-            )
-        cat.save()
-    return HttpResponseRedirect('/')
-
-def index(request):
-    cats = Cat.objects.all()
-    form = CatForm()
-    return render(request, 'index.html', {'cats':cats, 'form':form})
-
 def profile(request, username):
     user = User.objects.get(username=username)
-    cats = Cat.objects.all()
+    cats = Cat.objects.filter(user=user)
     return render(request, 'profile.html', {'username': username, 'cats': cats})
+
+
 
 def login_view(request):
     if request.method == 'POST':
@@ -82,7 +56,6 @@ def logout_view(request):
 
 def like_cat(request):
     cat_id = request.GET.get('cat_id', None)
-
     likes = 0
     if (cat_id):
         cat = Cat.objects.get(id=int(cat_id))
@@ -91,3 +64,4 @@ def like_cat(request):
             cat.likes = likes 
             cat.save()
     return HttpResponse(likes)
+    
